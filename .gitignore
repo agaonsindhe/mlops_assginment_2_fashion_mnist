@@ -1,0 +1,31 @@
+# Ignore dataset and model artifacts
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+models/*
+!models/.gitkeep
+
+# Ignore logs
+logs/*
+
+# Ignore Jupyter Notebook checkpoints
+notebooks/.ipynb_checkpoints/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore DVC and MLflow artifacts
+mlruns/
+venv/
+.venv/
+.idea/
+
+# Ignore    DVC cache and temp files
+.dvc/cache/
+.dvc/tmp/configs/config.yaml
+.dvc/tmp
+
+# Ignore config files containing sensitive credentials
+configs/config.yaml

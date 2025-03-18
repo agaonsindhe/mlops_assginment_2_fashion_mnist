@@ -1,0 +1,5 @@
+outs:
+- md5: e6d24ffff98bc973b3c14df1b4a56631
+  size: 10128
+  hash: md5
+  path: test_labels.npy

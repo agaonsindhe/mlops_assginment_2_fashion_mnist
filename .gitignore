@@ -29,3 +29,4 @@ venv/
 
 # Ignore config files containing sensitive credentials
 configs/config.yaml
+.dvc/config.local

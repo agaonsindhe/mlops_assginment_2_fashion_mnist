@@ -1,9 +1,14 @@
-# Ignore dataset and model artifacts
+# Ignore dataset and model artifacts (but not .dvc tracking files)
 data/raw/*
+!data/raw/*.dvc
 !data/raw/.gitkeep
+
 data/processed/*
+!data/processed/*.dvc
 !data/processed/.gitkeep
+
 models/*
+!models/*.dvc
 !models/.gitkeep
 
 # Ignore logs

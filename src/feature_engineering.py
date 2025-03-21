@@ -1,23 +1,25 @@
-import numpy as np
 import os
-import dvc.api
-from sklearn.model_selection import train_test_split
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 class FeatureEngineeringPipeline:
-    def __init__(self, train_images, train_labels, processed_dir="data/processed"):
+    def __init__(self, train_images, train_labels, processed_dir="data/processed", plot_dir="data/feature_importance"):
         """
-        Initializes with raw images and labels.
+        Initializes with raw images and labels, as well as directories to save processed data and plots.
         """
         self.train_images = train_images
         self.train_labels = train_labels
         self.processed_dir = processed_dir  # Directory to store processed data
+        self.plot_dir = plot_dir  # Directory to store feature importance plots
         self.X_train = None
         self.X_val = None
         self.y_train = None
         self.y_val = None
         self.pca = None
+
+        # Create the plot directory if it doesn't exist
+        os.makedirs(self.plot_dir, exist_ok=True)
 
     def preprocess_data(self):
         """ Normalize the data and flatten the images """
@@ -31,7 +33,7 @@ class FeatureEngineeringPipeline:
         """ Split the data into training and validation sets """
         X = self.preprocess_data()
         # Split the data into training and validation sets
-
+        from sklearn.model_selection import train_test_split
         self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(X, self.train_labels, test_size=test_size,
                                                                               random_state=42)
         print(f"X_train shape: {self.X_train.shape}")
@@ -73,36 +75,22 @@ class FeatureEngineeringPipeline:
 
         print(f"✅ Processed data saved in '{self.processed_dir}'.")
 
-    def track_processed_data_with_dvc(self):
-        """ Track the processed data with DVC """
-        # DVC tracking commands
-        os.system("dvc add data/processed/X_train.npy")
-        os.system("dvc add data/processed/X_val.npy")
-        os.system("dvc add data/processed/y_train.npy")
-        os.system("dvc add data/processed/y_val.npy")
-
-        # Commit the DVC changes
-        os.system("git add .")
-        os.system("git commit -m 'Add processed data and DVC tracking'")
-        os.system("git push origin main")  # Push to GitHub
-        os.system("dvc push")  # Push to DVC remote storage
-
-        print("✅ Processed data tracked with DVC.")
-
-    def explain_feature_importance(self):
+    def visualize_feature_importance(self):
         """ Visualize feature importance based on feature engineering decisions (Normalization, PCA, etc.) """
         # Visualizing the effect of normalization
         plt.hist(self.X_train.flatten(), bins=50, alpha=0.5, label="Normalized Features")
         plt.legend()
         plt.title("Effect of Normalization on Feature Distribution")
-        plt.show()
+        plt.savefig(os.path.join(self.plot_dir, "effect_of_normalization.png"))  # Save plot as image
+        plt.close()
 
         # Visualizing the explained variance after PCA
         plt.plot(np.cumsum(self.pca.explained_variance_ratio_))
         plt.xlabel('Number of Components')
         plt.ylabel('Explained Variance')
         plt.title('Explained Variance vs. Number of PCA Components')
-        plt.show()
+        plt.savefig(os.path.join(self.plot_dir, "explained_variance_pca.png"))  # Save plot as image
+        plt.close()
 
 
 def main():
@@ -125,11 +113,8 @@ def main():
     # Step 4: Save processed data in the processed/ folder
     fe_pipeline.save_processed_data()
 
-    # Step 5: Track processed data with DVC
-    fe_pipeline.track_processed_data_with_dvc()
-
-    # Step 6: Visualize the feature importance (based on feature engineering decisions)
-    fe_pipeline.explain_feature_importance()
+    # Step 5: Visualize the feature importance (based on feature engineering decisions)
+    fe_pipeline.visualize_feature_importance()
 
 
 # Ensure the main function runs when the script is executed

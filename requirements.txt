@@ -4,3 +4,6 @@ numpy
 dvc[azure]
 ydata-profiling
 pydantic-settings
+scikit-learn
+ipython
+matplotlib

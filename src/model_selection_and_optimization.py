@@ -1,10 +1,14 @@
+from sklearn.model_selection import cross_val_score  # Add this import
+
+# Other imports...
 import numpy as np
 import pandas as pd
 from tpot import TPOTClassifier
 import optuna
 from sklearn.metrics import accuracy_score
-from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 
 class ModelSelectionAndOptimization:
@@ -25,7 +29,7 @@ class ModelSelectionAndOptimization:
         print("Starting AutoML model selection using TPOT...")
 
         # Initialize TPOTClassifier with generations and population size for optimization
-        tpot = TPOTClassifier(verbosity=2, generations=5, population_size=20, random_state=42)
+        tpot = TPOTClassifier(verbosity=2, generations=3, population_size=10, random_state=42, n_jobs=-1)
 
         # Fit the model using training data
         tpot.fit(self.X_train, self.y_train)

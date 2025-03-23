@@ -1,4 +1,6 @@
 import os
+
+import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -61,6 +63,10 @@ class FeatureEngineeringPipeline:
         self.X_train = self.pca.fit_transform(self.X_train)
         self.X_val = self.pca.transform(self.X_val)
         print(f"Number of features after PCA: {self.X_train.shape[1]}")
+
+        # Save the PCA model after fitting
+        joblib.dump(self.pca, 'models/pca_model.pkl')
+        print('PCA object ',type(joblib.load('models/pca_model.pkl')))
 
     def save_processed_data(self):
         """ Save processed data to the 'processed' folder """

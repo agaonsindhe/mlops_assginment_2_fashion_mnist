@@ -1,5 +1,5 @@
 import os
-
+import shap
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,14 +27,14 @@ class FeatureEngineeringPipeline:
         """ Normalize the data and flatten the images """
         # Normalize the images to [0, 1]
         self.train_images = self.train_images / 255.0
-        # Flatten the images (28x28 -> 784 features per image)
+
         X = self.train_images.reshape(self.train_images.shape[0], -1)
         return X
 
     def split_data(self, test_size=0.2):
         """ Split the data into training and validation sets """
         X = self.preprocess_data()
-        # Split the data into training and validation sets
+
         from sklearn.model_selection import train_test_split
         self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(X, self.train_labels, test_size=test_size,
                                                                               random_state=42)
@@ -43,7 +43,7 @@ class FeatureEngineeringPipeline:
 
     def remove_highly_correlated_features(self, threshold=0.9):
         """ Remove highly correlated features from the data """
-        corr_matrix = pd.DataFrame(self.X_train).corr().abs()  # Calculate the correlation matrix (absolute values)
+        corr_matrix = pd.DataFrame(self.X_train).corr().abs()
         upper_tri = np.triu(corr_matrix, k=1)  # Upper triangular matrix (to avoid redundancy)
         to_drop = [column for column in corr_matrix.columns if any(corr_matrix[column] > threshold)]
 
@@ -79,7 +79,7 @@ class FeatureEngineeringPipeline:
         np.save(os.path.join(self.processed_dir, "y_train.npy"), self.y_train)
         np.save(os.path.join(self.processed_dir, "y_val.npy"), self.y_val)
 
-        print(f"✅ Processed data saved in '{self.processed_dir}'.")
+        print(f"Processed data saved in '{self.processed_dir}'.")
 
     def visualize_feature_importance(self):
         """ Visualize feature importance based on feature engineering decisions (Normalization, PCA, etc.) """
@@ -97,6 +97,49 @@ class FeatureEngineeringPipeline:
         plt.title('Explained Variance vs. Number of PCA Components')
         plt.savefig(os.path.join(self.plot_dir, "explained_variance_pca.png"))  # Save plot as image
         plt.close()
+
+    def explain_features_with_shap(self):
+        """ Use SHAP for feature explainability """
+        print("Starting SHAP feature explainability...")
+
+        # Use K-means to reduce the background data size to K clusters
+        background_data = shap.sample(self.X_train, 50)
+
+        # Initialize SHAP explainer (KernelExplainer is used for non-tree-based models)
+        explainer = shap.KernelExplainer(lambda x: x, background_data)
+
+        # Calculate SHAP values
+        self.shap_values = explainer.shap_values(self.X_train)
+
+        # Create a SHAP summary plot
+        shap.summary_plot(self.shap_values, self.X_train)
+        plt.savefig(os.path.join(self.plot_dir, "shap_summary_plot.png"))
+        plt.close()
+        print("SHAP summary plot saved as 'shap_summary_plot.png'.")
+
+    def visualize_shap_dependence_plot(self):
+        """ SHAP Dependence Plot for top features """
+        # Visualize a dependence plot for the first feature in X_train (choose feature index as needed)
+        shap.dependence_plot(0, self.X_train, self.shap_values)
+        plt.savefig(os.path.join(self.plot_dir, "shap_dependence_plot.png"))
+        plt.close()
+        print("SHAP dependence plot saved as 'shap_dependence_plot.png'.")
+
+    def visualize_shap_force_plot(self):
+        """ SHAP Force Plot for a single prediction """
+        shap.initjs()  # For interactive plots in Jupyter or similar
+        # Visualize the force plot for the first instance in the validation set
+        shap.force_plot(self.shap_values[0], self.X_train[0])
+        plt.savefig(os.path.join(self.plot_dir, "shap_force_plot.png"))
+        plt.close()
+        print("SHAP force plot saved as 'shap_force_plot.png'.")
+
+    def visualize_shap_beeswarm_plot(self):
+        """ SHAP Beeswarm Plot for overall feature importance """
+        shap.beeswarm(self.shap_values)
+        plt.savefig(os.path.join(self.plot_dir, "shap_beeswarm_plot.png"))
+        plt.close()
+        print("SHAP beeswarm plot saved as 'shap_beeswarm_plot.png'.")
 
 
 def main():
@@ -122,7 +165,11 @@ def main():
     # Step 5: Visualize the feature importance (based on feature engineering decisions)
     fe_pipeline.visualize_feature_importance()
 
+    # Step 6: Explain features using SHAP
+    fe_pipeline.explain_features_with_shap()
+    fe_pipeline.visualize_shap_dependence_plot()
+    fe_pipeline.visualize_shap_force_plot()
+    fe_pipeline.visualize_shap_beeswarm_plot()
 
-# Ensure the main function runs when the script is executed
 if __name__ == "__main__":
     main()

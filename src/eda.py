@@ -13,12 +13,10 @@ df = pd.DataFrame(flattened_images)  # Flatten the image data
 df['label'] = train_labels  # Add the labels column
 
 # Sample 10% of the data for quick processing
-df_sample = df.sample(frac=0.1, random_state=42)  # 10% of the data
+df_sample = df.sample(frac=0.1, random_state=42)
 
-# Verify the size
-print(f"Sampled data size: {df_sample.shape}")
 # Generate EDA report using ydata-profiling
 profile = ProfileReport(df_sample, title="Fashion MNIST EDA Report", explorative=True, minimal=True)
 profile.to_file("reports/eda_report.html")
 
-print("✅ EDA report generated: reports/eda_report.html")
+print("EDA report generated: reports/eda_report.html")

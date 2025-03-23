@@ -10,3 +10,4 @@ matplotlib
 tpot
 optuna
 mlflow
+shap

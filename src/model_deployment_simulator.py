@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import mlflow
 import mlflow.sklearn
 import numpy as np
@@ -15,23 +17,21 @@ logging.basicConfig(
 )
 
 # Set up MLflow experiment
-mlflow.set_experiment("fashion_mnist_model_tracking")
+experiment_name = f"fashion_mnist_model_tracking - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+mlflow.set_experiment(experiment_name)
 
 
 class ModelDeploymentSimulator:
     def __init__(self, model, pca, X_val, y_val):
-        self.model = model  # Loaded model
-        self.pca = pca  # Loaded PCA model
-        self.X_val = X_val  # Validation data
-        self.y_val = y_val  # True labels
+        self.model = model
+        self.pca = pca
+        self.X_val = X_val
+        self.y_val = y_val
         self.previous_accuracy = None
 
-        # Ensure PCA is loaded correctly
         if not isinstance(self.pca, PCA):
             print("PCA is :", type(self.pca))
             raise ValueError("Loaded PCA model is not of type 'PCA'")
-        else:
-            type(self.pca)
 
     def generate_new_data(self):
         """ Generate new data to simulate incoming requests """
@@ -43,7 +43,6 @@ class ModelDeploymentSimulator:
 
     def serve_prediction(self, data):
         """ Simulate prediction by the deployed model """
-        # Apply PCA transformation to incoming data
         data_pca = self.pca.transform(data.reshape(1, -1))
         prediction = self.model.predict(data_pca)
         return prediction

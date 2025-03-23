@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore", message="Warning: optional dependency `torch` 
 # Set up logger
 logging.basicConfig(
     filename='logs/model_selection_and_optimization.log',  # Log file name
-    level=logging.INFO,  # Log level (INFO will capture everything)
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'  # Log format
 )
 
@@ -157,11 +157,6 @@ class ModelSelectionAndOptimization:
         logging.info("\n--- Hyperparameter Tuning Logs ---")
         logging.info(f"Best Hyperparameters: {self.optuna_results['best_trial_params']}")
         logging.info(f"Best Trial Value: {self.optuna_results['best_trial_value']}")
-
-        logging.info("\n--- Justification for Chosen Model ---")
-        logging.info("The chosen model is based on AutoML results using TPOT, which selected the best pipeline. "
-                     "The best hyperparameters were optimized using Optuna. "
-                     "The performance of the final model was evaluated on the validation set, achieving the best accuracy.")
 
 
 def main():

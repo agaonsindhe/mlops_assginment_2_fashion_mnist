@@ -70,6 +70,7 @@ class DriftDetectionAndMonitoring:
         self.log_performance_metrics(current_accuracy,self.X_val, self.y_val,self.detect_drift(current_accuracy))
         if self.detect_drift(current_accuracy):
             print("Model drift detected. Retraining required.")
+            # We can call trigger_retraining to simulate real time retraining whenever drift is detected.
         return current_accuracy
 
     def evaluate_model(self, data):

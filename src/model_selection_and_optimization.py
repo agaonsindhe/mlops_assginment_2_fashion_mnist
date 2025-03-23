@@ -169,19 +169,19 @@ def main():
     # Initialize the model selection and optimization class
     model_selection = ModelSelectionAndOptimization(X_train, X_val, y_train, y_val)
 
-    # Step 1: Use AutoML (TPOT) for model selection
+    # Use AutoML (TPOT) for model selection
     model_selection.automl_model_selection()
 
-    # Step 2: Hyperparameter Optimization using Optuna
+    #  Hyperparameter Optimization using Optuna
     optimized_model = model_selection.hyperparameter_optimization()
 
-    # Step 3: Evaluate the final optimized model
+    #  Evaluate the final optimized model
     model_selection.evaluate_model(optimized_model)
 
-    # Step 4: Save the best model
+    # Save the best model
     model_selection.save_best_model(optimized_model)
 
-    # Step 5: Print the deliverables
+    #  Print the deliverables
     model_selection.print_deliverables()
 
 

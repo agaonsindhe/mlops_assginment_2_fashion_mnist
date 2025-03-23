@@ -9,8 +9,8 @@ train_labels = np.load("data/raw/train_labels.npy")
 
 # Flatten images into 1D arrays and add labels as a column
 flattened_images = train_images.reshape(train_images.shape[0], -1)
-df = pd.DataFrame(flattened_images)  # Flatten the image data
-df['label'] = train_labels  # Add the labels column
+df = pd.DataFrame(flattened_images)
+df['label'] = train_labels
 
 # Sample 10% of the data for quick processing
 df_sample = df.sample(frac=0.1, random_state=42)

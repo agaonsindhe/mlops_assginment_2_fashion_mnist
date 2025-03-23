@@ -12,20 +12,18 @@ class FeatureEngineeringPipeline:
         """
         self.train_images = train_images
         self.train_labels = train_labels
-        self.processed_dir = processed_dir  # Directory to store processed data
-        self.plot_dir = plot_dir  # Directory to store feature importance plots
+        self.processed_dir = processed_dir
+        self.plot_dir = plot_dir
         self.X_train = None
         self.X_val = None
         self.y_train = None
         self.y_val = None
         self.pca = None
 
-        # Create the plot directory if it doesn't exist
         os.makedirs(self.plot_dir, exist_ok=True)
 
     def preprocess_data(self):
         """ Normalize the data and flatten the images """
-        # Normalize the images to [0, 1]
         self.train_images = self.train_images / 255.0
 
         X = self.train_images.reshape(self.train_images.shape[0], -1)
@@ -44,7 +42,7 @@ class FeatureEngineeringPipeline:
     def remove_highly_correlated_features(self, threshold=0.9):
         """ Remove highly correlated features from the data """
         corr_matrix = pd.DataFrame(self.X_train).corr().abs()
-        upper_tri = np.triu(corr_matrix, k=1)  # Upper triangular matrix (to avoid redundancy)
+        upper_tri = np.triu(corr_matrix, k=1)
         to_drop = [column for column in corr_matrix.columns if any(corr_matrix[column] > threshold)]
 
         print(f"Removing {len(to_drop)} highly correlated features")
@@ -66,7 +64,6 @@ class FeatureEngineeringPipeline:
 
         # Save the PCA model after fitting
         joblib.dump(self.pca, 'models/pca_model.pkl')
-        print('PCA object ',type(joblib.load('models/pca_model.pkl')))
 
     def save_processed_data(self):
         """ Save processed data to the 'processed' folder """
@@ -102,7 +99,6 @@ class FeatureEngineeringPipeline:
         """ Use SHAP for feature explainability """
         print("Starting SHAP feature explainability...")
 
-        # Use K-means to reduce the background data size to K clusters
         background_data = shap.sample(self.X_train, 50)
 
         # Initialize SHAP explainer (KernelExplainer is used for non-tree-based models)
@@ -127,8 +123,7 @@ class FeatureEngineeringPipeline:
 
     def visualize_shap_force_plot(self):
         """ SHAP Force Plot for a single prediction """
-        shap.initjs()  # For interactive plots in Jupyter or similar
-        # Visualize the force plot for the first instance in the validation set
+        shap.initjs()
         shap.force_plot(self.shap_values[0], self.X_train[0])
         plt.savefig(os.path.join(self.plot_dir, "shap_force_plot.png"))
         plt.close()
@@ -150,22 +145,22 @@ def main():
     # Initialize the pipeline
     fe_pipeline = FeatureEngineeringPipeline(train_images, train_labels)
 
-    # Step 1: Split the data into train and validation sets
+    #  Split the data into train and validation sets
     fe_pipeline.split_data(test_size=0.2)
 
-    # Step 2: Remove highly correlated features
+    # Remove highly correlated features
     fe_pipeline.remove_highly_correlated_features(threshold=0.9)
 
-    # Step 3: Apply PCA for dimensionality reduction
+    #  Apply PCA for dimensionality reduction
     fe_pipeline.apply_pca(n_components=0.95)
 
-    # Step 4: Save processed data in the processed/ folder
+    # Save processed data in the processed/ folder
     fe_pipeline.save_processed_data()
 
-    # Step 5: Visualize the feature importance (based on feature engineering decisions)
+    # Visualize the feature importance (based on feature engineering decisions)
     fe_pipeline.visualize_feature_importance()
 
-    # Step 6: Explain features using SHAP
+    #  Explain features using SHAP
     fe_pipeline.explain_features_with_shap()
     fe_pipeline.visualize_shap_dependence_plot()
     fe_pipeline.visualize_shap_force_plot()

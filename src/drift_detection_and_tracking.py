@@ -21,7 +21,7 @@ class DriftDetectionAndMonitoring:
 
     def log_performance_metrics(self, accuracy, X_val, y_val, drift_detected):
         """ Log model performance metrics to MLflow dynamically """
-        y_pred = self.model.predict(X_val)  # Get predictions on the validation set
+        y_pred = self.model.predict(X_val)
 
         # Calculate metrics dynamically
         precision = precision_score(y_val, y_pred, average='weighted', zero_division=1)
@@ -50,21 +50,21 @@ class DriftDetectionAndMonitoring:
     def trigger_retraining(self):
         """ Simulate retraining the model due to detected drift """
         print("Retraining triggered due to model drift.")
-        self.model.fit(self.X_train, self.y_train)  # Retrain with new data
-        joblib.dump(self.model, 'retrained_model.pkl')  # Save retrained model
+        self.model.fit(self.X_train, self.y_train)
+        joblib.dump(self.model, 'retrained_model.pkl')
 
         # Log retrained model in MLflow
         with mlflow.start_run():
             mlflow.log_metric("accuracy", self.model.score(self.X_val, self.y_val))  # Log new accuracy
             mlflow.sklearn.log_model(self.model, "retrained_model")
-            mlflow.log_param("model_type", "MLPClassifier")  # Example parameter logging
+            mlflow.log_param("model_type", "MLPClassifier")
 
     def track_performance_over_time(self, current_data, pca):
         """ Simulate tracking performance and detect drift """
         # Apply PCA transformation to the new data
         data_pca = pca.transform(current_data.reshape(1, -1))
-        prediction = self.model.predict(data_pca)  # Get model prediction using transformed data
-        current_accuracy = self.evaluate_model(data_pca)  # Or keep using raw data for evaluation if appropriate
+        prediction = self.model.predict(data_pca)
+        current_accuracy = self.evaluate_model(data_pca)
 
         # Log performance and detect drift
         self.log_performance_metrics(current_accuracy,self.X_val, self.y_val,self.detect_drift(current_accuracy))
@@ -75,4 +75,4 @@ class DriftDetectionAndMonitoring:
 
     def evaluate_model(self, data):
         """ Simulate model evaluation and calculate accuracy """
-        return np.random.rand()  # Replace with actual evaluation logic
+        return np.random.rand()

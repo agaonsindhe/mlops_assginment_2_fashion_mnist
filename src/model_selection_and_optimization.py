@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore", message="Warning: optional dependency `torch` 
 
 # Set up logger
 logging.basicConfig(
-    filename='model_selection_and_optimization.log',  # Log file name
+    filename='logs/model_selection_and_optimization.log',  # Log file name
     level=logging.INFO,  # Log level (INFO will capture everything)
     format='%(asctime)s - %(levelname)s - %(message)s'  # Log format
 )

@@ -1,0 +1,5 @@
+outs:
+- md5: 58ca5c33b1bc06a8f27c256212fb6af2
+  size: 959456
+  hash: md5
+  path: fashion_mnist_best_model.pkl

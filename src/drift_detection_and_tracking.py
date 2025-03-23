@@ -19,7 +19,7 @@ class DriftDetectionAndMonitoring:
         self.previous_accuracy = None
         self.drift_threshold = 0.05
 
-    def log_performance_metrics(self, accuracy, X_val, y_val):
+    def log_performance_metrics(self, accuracy, X_val, y_val, drift_detected):
         """ Log model performance metrics to MLflow dynamically """
         y_pred = self.model.predict(X_val)  # Get predictions on the validation set
 
@@ -33,6 +33,7 @@ class DriftDetectionAndMonitoring:
         mlflow.log_metric("precision", precision)
         mlflow.log_metric("recall", recall)
         mlflow.log_metric("f1_score", f1)
+        mlflow.log_metric("drift detected", drift_detected)
 
     def detect_drift(self, current_accuracy):
         """ Compare current accuracy with previous and check for drift """
@@ -58,18 +59,19 @@ class DriftDetectionAndMonitoring:
             mlflow.sklearn.log_model(self.model, "retrained_model")
             mlflow.log_param("model_type", "MLPClassifier")  # Example parameter logging
 
-    def track_performance_over_time(self, current_data):
+    def track_performance_over_time(self, current_data, pca):
         """ Simulate tracking performance and detect drift """
-        prediction = self.model.predict([current_data])  # Get model prediction
-        current_accuracy = self.evaluate_model(current_data)  # Get accuracy (or any metric)
+        # Apply PCA transformation to the new data
+        data_pca = pca.transform(current_data.reshape(1, -1))
+        prediction = self.model.predict(data_pca)  # Get model prediction using transformed data
+        current_accuracy = self.evaluate_model(data_pca)  # Or keep using raw data for evaluation if appropriate
 
         # Log performance and detect drift
-        self.log_performance_metrics(current_accuracy)
+        self.log_performance_metrics(current_accuracy,self.X_val, self.y_val,self.detect_drift(current_accuracy))
         if self.detect_drift(current_accuracy):
-            self.trigger_retraining()
+            print("Model drift detected. Retraining required.")
         return current_accuracy
 
     def evaluate_model(self, data):
         """ Simulate model evaluation and calculate accuracy """
-        # For simplicity, returning a random accuracy (you can use real evaluation here)
         return np.random.rand()  # Replace with actual evaluation logic

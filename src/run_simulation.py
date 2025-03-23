@@ -13,11 +13,12 @@ y_val = np.load('data/processed/y_val.npy')
 # Load the trained model
 model = joblib.load('models/fashion_mnist_best_model.pkl')
 pca = joblib.load('models/pca_model.pkl')
+print("PCA is ",type(pca))
 # Initialize the ModelDeploymentSimulator
-deployment_simulator = ModelDeploymentSimulator(model, X_val, y_val, pca)
+deployment_simulator = ModelDeploymentSimulator(model, pca,X_val, y_val)
 
 # Simulate data generation and drift
-for _ in range(10):  # Simulating 10 rounds
+for _ in range(100):  # Simulating 10 rounds
     current_data = deployment_simulator.generate_new_data()  # Simulate new data
     current_accuracy = model.score(X_val, y_val)  # Get current accuracy
     deployment_simulator.monitor_performance(current_data, current_accuracy)  # Log performance
@@ -26,6 +27,6 @@ for _ in range(10):  # Simulating 10 rounds
 drift_monitor = DriftDetectionAndMonitoring(model, X_train, X_val, y_train, y_val)
 
 # Simulate monitoring performance over time
-for _ in range(10):  # Simulating 10 rounds of predictions
+for _ in range(100):  # Simulating 10 rounds of predictions
     current_data = deployment_simulator.generate_new_data()  # Simulate new data
-    drift_monitor.track_performance_over_time(current_data)  # Track performance and detect drift
+    drift_monitor.track_performance_over_time(current_data,pca)  # Track performance and detect drift

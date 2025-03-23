@@ -3,6 +3,8 @@ import mlflow.sklearn
 import numpy as np
 import joblib
 import logging
+
+from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 # Set up logger for model performance
@@ -24,9 +26,16 @@ class ModelDeploymentSimulator:
         self.y_val = y_val  # True labels
         self.previous_accuracy = None
 
+        # Ensure PCA is loaded correctly
+        if not isinstance(self.pca, PCA):
+            print("PCA is :", type(self.pca))
+            raise ValueError("Loaded PCA model is not of type 'PCA'")
+        else:
+            type(self.pca)
+
     def generate_new_data(self):
         """ Generate new data to simulate incoming requests """
-        return np.random.rand(784)  # Example for Fashion MNIST
+        return np.random.rand(784).reshape(1, -1)
 
     def simulate_drift(self, data):
         """ Simulate drift by adding noise to data """
@@ -35,14 +44,14 @@ class ModelDeploymentSimulator:
     def serve_prediction(self, data):
         """ Simulate prediction by the deployed model """
         # Apply PCA transformation to incoming data
-        data_pca = self.pca.transform([data])  # Transform new data to match the training data shape
+        data_pca = self.pca.transform(data.reshape(1, -1))
         prediction = self.model.predict(data_pca)
         return prediction
 
     def monitor_performance(self, current_data, current_accuracy):
         """ Log performance over time using MLflow """
         # Apply PCA transformation to incoming data
-        data_pca = self.pca.transform([current_data])  # Transform new data for prediction
+        data_pca = self.pca.transform(current_data.reshape(1, -1))
 
         # Get prediction from model
         prediction = self.serve_prediction(current_data)

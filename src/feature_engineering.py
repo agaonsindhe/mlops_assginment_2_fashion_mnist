@@ -66,6 +66,7 @@ class FeatureEngineeringPipeline:
 
         # Save the PCA model after fitting
         joblib.dump(self.pca, 'models/pca_model.pkl')
+        print('PCA object ',type(joblib.load('models/pca_model.pkl')))
 
     def save_processed_data(self):
         """ Save processed data to the 'processed' folder """

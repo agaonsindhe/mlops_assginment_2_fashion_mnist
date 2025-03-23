@@ -144,7 +144,7 @@ class ModelSelectionAndOptimization:
             model = self.best_model
 
         # Save the model using joblib
-        joblib.dump(model, 'fashion_mnist_best_model.pkl')
+        joblib.dump(model, 'models/fashion_mnist_best_model.pkl')
         print("✅ Best Model saved as 'fashion_mnist_best_model.pkl'")
 
     def print_deliverables(self):
